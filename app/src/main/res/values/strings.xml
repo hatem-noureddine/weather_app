@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">WeatherHN</string>
+    <string name="location_empty_list">Sorry, there is no location defined yet.\nYou need to click on the + button to add new city.</string>
 </resources>
