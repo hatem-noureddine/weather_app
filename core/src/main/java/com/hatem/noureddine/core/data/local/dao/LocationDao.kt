@@ -1,6 +1,5 @@
 package com.hatem.noureddine.core.data.local.dao
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -8,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.hatem.noureddine.core.data.local.LOCATION_DB_TABLE_NAME
 import com.hatem.noureddine.core.data.local.models.DBLocation
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Location DAO
@@ -27,7 +27,7 @@ internal interface LocationDao {
      * @return LiveData<List<DBLocation>>
      */
     @Query("SELECT * from $LOCATION_DB_TABLE_NAME ORDER BY name ASC")
-    fun getLocations(): LiveData<List<DBLocation>>
+    fun getLocations(): Flow<List<DBLocation>>
 
     /**
      * delete all location from database

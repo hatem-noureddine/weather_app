@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.places.api.model.Place
 import com.hatem.noureddine.core.domain.WeatherSDK
 import com.hatem.noureddine.core.domain.exceptions.GenericException
@@ -14,11 +15,12 @@ class LocationsViewModel @ViewModelInject constructor(private val weatherSDK: We
     ViewModel() {
 
     fun getLocations(): LiveData<out Resource<List<Location>>> =
-        weatherSDK.LocationRepository.getLocations()
+        weatherSDK.LocationRepository.getLocations(viewModelScope.coroutineContext)
 
     fun insertLocation(place: Place): LiveData<out Resource<Location>> {
         return if (place.name?.isNotBlank() == true && place.latLng != null) {
             weatherSDK.LocationRepository.insertLocation(
+                viewModelScope.coroutineContext,
                 Location(
                     name = place.name!!,
                     longitude = place.latLng!!.longitude,
