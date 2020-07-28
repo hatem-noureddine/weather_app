@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.coroutineScope
 import com.google.android.libraries.places.api.Places
 import com.hatem.noureddine.core.domain.WeatherSDK
 import com.hatem.noureddine.core.domain.models.Location
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         weatherSDK.LocationRepository.insertLocation(
+            lifecycle.coroutineScope.coroutineContext,
             Location(
                 longitude = 10.634584,
                 latitude = 35.8245029,
@@ -46,18 +48,23 @@ class MainActivity : AppCompatActivity() {
         })
 
 
-        weatherSDK.LocationRepository.getLocations().observe(this, Observer {
-            if (it is Resource.Error) {
-                it.throwable.printStackTrace()
-            }
+        weatherSDK.LocationRepository.getLocations(lifecycle.coroutineScope.coroutineContext)
+            .observe(this, Observer {
+                if (it is Resource.Error) {
+                    it.throwable.printStackTrace()
+                }
 
-            if (it is Resource.Success) {
-                Log.e("TAG", "GetLocations: ${it.data}")
-            }
-        })
+                if (it is Resource.Success) {
+                    Log.e("TAG", "GetLocations: ${it.data}")
+                }
+            })
 
 
-        weatherSDK.weatherRepository.getWeathers(10.634584, 35.8245029)
+        weatherSDK.weatherRepository.getWeathers(
+            lifecycle.coroutineScope.coroutineContext,
+            10.634584,
+            35.8245029
+        )
             .observe(this, Observer {
                 if (it is Resource.Error) {
                     it.throwable.printStackTrace()

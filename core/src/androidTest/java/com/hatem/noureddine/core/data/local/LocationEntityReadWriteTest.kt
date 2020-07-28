@@ -7,7 +7,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.hatem.noureddine.core.data.local.dao.LocationDao
 import com.hatem.noureddine.core.data.local.models.DBLocation
-import com.hatem.noureddine.core.utils.getOrAwaitValue
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -48,7 +48,7 @@ class LocationEntityReadWriteTest {
         val location = DBLocation(longitude = 10.10, latitude = 12.12, name = "test-db")
         runBlocking {
             locationDao.insert(location)
-            val locations = locationDao.getLocations().getOrAwaitValue()
+            val locations = locationDao.getLocations().first()
             Assert.assertEquals(locations.isNotEmpty(), true)
             Assert.assertEquals(locations.size, 1)
         }
@@ -71,7 +71,7 @@ class LocationEntityReadWriteTest {
                 locationDao.insert(it)
             }
 
-            val locationsDB = locationDao.getLocations().getOrAwaitValue()
+            val locationsDB = locationDao.getLocations().first()
             Assert.assertEquals(locationsDB.isNotEmpty(), true)
             Assert.assertEquals(locationsDB.size, 3)
             locationsDB.forEachIndexed { index, item ->
@@ -100,10 +100,10 @@ class LocationEntityReadWriteTest {
                 locationDao.insert(it)
             }
 
-            val locationsDB = locationDao.getLocations().getOrAwaitValue()
+            val locationsDB = locationDao.getLocations().first()
             Assert.assertEquals(locationsDB.isNotEmpty(), true)
             locationDao.deleteAll()
-            val locationsAfterDelete = locationDao.getLocations().getOrAwaitValue()
+            val locationsAfterDelete = locationDao.getLocations().first()
             Assert.assertEquals(locationsAfterDelete.isEmpty(), true)
         }
     }
@@ -125,7 +125,7 @@ class LocationEntityReadWriteTest {
                 locationDao.insert(it)
             }
 
-            val locationsDB = locationDao.getLocations().getOrAwaitValue()
+            val locationsDB = locationDao.getLocations().first()
             Assert.assertEquals(locationsDB.isNotEmpty(), true)
             Assert.assertEquals(locationsDB.size, 3)
 
@@ -133,7 +133,7 @@ class LocationEntityReadWriteTest {
             val locationsDel = locations.toMutableList()
             locationsDel.remove(item)
 
-            val locationsAfterDelete = locationDao.getLocations().getOrAwaitValue()
+            val locationsAfterDelete = locationDao.getLocations().first()
             Assert.assertEquals(locationsAfterDelete.isNotEmpty(), true)
             Assert.assertEquals(locationsAfterDelete.size, 2)
 
