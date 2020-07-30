@@ -2,6 +2,7 @@ package com.hatem.noureddine.core.domain
 
 import android.content.Context
 import android.content.pm.PackageManager
+import androidx.lifecycle.LiveData
 import com.hatem.noureddine.core.data.local.WeatherDatabase
 import com.hatem.noureddine.core.data.local.dao.LocationDao
 import com.hatem.noureddine.core.data.local.dao.WeatherDao
@@ -9,6 +10,9 @@ import com.hatem.noureddine.core.data.remote.datasources.WeatherRemoteDataSource
 import com.hatem.noureddine.core.data.remote.datasources.WeatherRemoteDataSourceImp
 import com.hatem.noureddine.core.data.remote.interceptors.WeatherAppIdInterceptor
 import com.hatem.noureddine.core.data.remote.services.WeatherService
+import com.hatem.noureddine.core.domain.models.Location
+import com.hatem.noureddine.core.domain.models.Resource
+import com.hatem.noureddine.core.domain.models.Weather
 import com.hatem.noureddine.core.domain.repositories.LocationRepository
 import com.hatem.noureddine.core.domain.repositories.LocationRepositoryImp
 import com.hatem.noureddine.core.domain.repositories.WeatherRepository
@@ -78,11 +82,37 @@ class WeatherSDK(context: Context) {
         database.locationDao()
     }
 
-    val weatherRepository: WeatherRepository by lazy {
+    private val weatherRepository: WeatherRepository by lazy {
         WeatherRepositoryImp(weatherRemoteDataSource, weatherDao)
     }
 
-    val LocationRepository: LocationRepository by lazy {
+    private val LocationRepository: LocationRepository by lazy {
         LocationRepositoryImp(locationDao)
+    }
+
+    /**
+     * fetch weathers data for a location
+     * @param location Location
+     * @return LiveData<out Resource<List<Weather>>>
+     */
+    fun getWeathers(location: Location): LiveData<out Resource<List<Weather>>> {
+        return weatherRepository.getWeathers(location)
+    }
+
+    /**
+     * get stored location on database
+     * @return LiveData<out Resource<List<Location>>>
+     */
+    fun getLocations(): LiveData<out Resource<List<Location>>> {
+        return LocationRepository.getLocations()
+    }
+
+    /**
+     * insert a new location into database
+     * @param location Location
+     * @return LiveData<out Resource<Location>>
+     */
+    fun insertLocation(location: Location): LiveData<out Resource<Location>> {
+        return LocationRepository.insertLocation(location)
     }
 }
