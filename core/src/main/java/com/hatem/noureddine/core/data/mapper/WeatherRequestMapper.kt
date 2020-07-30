@@ -1,6 +1,7 @@
 package com.hatem.noureddine.core.data.mapper
 
 import com.hatem.noureddine.core.data.remote.models.OpenWeatherMapRequest
+import java.util.*
 
 /**
  * Convert Weather request object to query map
@@ -12,6 +13,8 @@ internal fun OpenWeatherMapRequest.toQueryMap(): Map<String, String> {
         put("lat", "$latitude")
         put("lon", "$longitude")
         put("exclude", exclude.joinToString(",", transform = { it.value }))
+        put("units", "metric")
+        put("lang", Locale.getDefault().isO3Language)
         toMap()
     }
 }
