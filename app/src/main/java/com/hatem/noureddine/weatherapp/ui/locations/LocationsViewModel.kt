@@ -17,11 +17,11 @@ class LocationsViewModel(application: Application) :
         get() = this.getApplication<SampleApplication>().weatherSDK
 
     fun getLocations(): LiveData<out Resource<List<Location>>> =
-        weatherSDK.LocationRepository.getLocations()
+        weatherSDK.getLocations()
 
     fun insertLocation(place: Place): LiveData<out Resource<Location>> {
         return if (place.name?.isNotBlank() == true && place.latLng != null) {
-            weatherSDK.LocationRepository.insertLocation(
+            weatherSDK.insertLocation(
                 Location(
                     name = place.name!!,
                     longitude = place.latLng!!.longitude,

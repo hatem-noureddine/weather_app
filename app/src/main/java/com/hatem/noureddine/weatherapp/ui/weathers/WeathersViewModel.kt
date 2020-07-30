@@ -14,5 +14,5 @@ class WeathersViewModel(application: Application) : AndroidViewModel(application
         get() = this.getApplication<SampleApplication>().weatherSDK
 
     fun getWeathers(location: Location): LiveData<out Resource<List<Weather>>> =
-        weatherSDK.weatherRepository.getWeathers(location)
+        weatherSDK.getWeathers(location)
 }
