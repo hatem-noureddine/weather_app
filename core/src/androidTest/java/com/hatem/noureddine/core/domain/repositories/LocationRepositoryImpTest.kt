@@ -4,10 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.hatem.noureddine.core.data.local.dao.LocationDao
-import com.hatem.noureddine.core.data.local.models.DBLocation
 import com.hatem.noureddine.core.domain.models.Resource
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
@@ -34,12 +32,6 @@ class LocationRepositoryImpTest {
 
     @Test
     fun getLocations() {
-        Mockito.`when`(mockLocationDao.getLocations()).thenReturn(
-            flow {
-                listOf(DBLocation(1, 10.10, 11.0, "test"))
-            }
-        )
-
         val observer = Mockito.spy(Observer<Resource<*>> {})
 
         runBlocking(Dispatchers.Main) {

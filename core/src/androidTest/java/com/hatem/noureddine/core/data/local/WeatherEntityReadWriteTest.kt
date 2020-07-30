@@ -11,7 +11,7 @@ import com.hatem.noureddine.core.data.local.models.DBLocation
 import com.hatem.noureddine.core.data.local.models.DBWeather
 import com.hatem.noureddine.core.data.local.models.FeelsLike
 import com.hatem.noureddine.core.data.local.models.Temperature
-import kotlinx.coroutines.flow.first
+import com.hatem.noureddine.core.utils.getOrAwaitValue
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert
@@ -64,7 +64,7 @@ class WeatherEntityReadWriteTest {
             weatherDao.insert(randomWeather(1))
             weatherDao.insert(randomWeather(2))
             weatherDao.insert(randomWeather(1))
-            val weathers = weatherDao.getWeathers(1).first()
+            val weathers = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathers.isNotEmpty(), true)
             Assert.assertEquals(weathers.size, 2)
         }
@@ -96,7 +96,7 @@ class WeatherEntityReadWriteTest {
                 weatherDao.insert(it)
             }
 
-            val weathersDB = weatherDao.getWeathers(1).first()
+            val weathersDB = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersDB.isNotEmpty(), true)
             Assert.assertEquals(weathersDB.size, 5)
 
@@ -133,14 +133,14 @@ class WeatherEntityReadWriteTest {
                 weatherDao.insert(it)
             }
 
-            val weathersDB = weatherDao.getWeathers(1).first()
+            val weathersDB = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersDB.isNotEmpty(), true)
             weatherDao.deleteAll()
 
-            val weathersAfterDelete = weatherDao.getWeathers(1).first()
+            val weathersAfterDelete = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersAfterDelete.isEmpty(), true)
 
-            val weathers2AfterDelete = weatherDao.getWeathers(2).first()
+            val weathers2AfterDelete = weatherDao.getWeathers(2).getOrAwaitValue()
             Assert.assertEquals(weathers2AfterDelete.isEmpty(), true)
         }
     }
@@ -169,14 +169,14 @@ class WeatherEntityReadWriteTest {
                 weatherDao.insert(it)
             }
 
-            val weathersDB = weatherDao.getWeathers(1).first()
+            val weathersDB = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersDB.isNotEmpty(), true)
             weatherDao.deleteAll(1)
 
-            val weathersAfterDelete = weatherDao.getWeathers(1).first()
+            val weathersAfterDelete = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersAfterDelete.isEmpty(), true)
 
-            val weathers2AfterDelete = weatherDao.getWeathers(2).first()
+            val weathers2AfterDelete = weatherDao.getWeathers(2).getOrAwaitValue()
             Assert.assertEquals(weathers2AfterDelete.isNotEmpty(), true)
         }
     }
@@ -205,7 +205,7 @@ class WeatherEntityReadWriteTest {
                 weatherDao.insert(it)
             }
 
-            val weathersDB = weatherDao.getWeathers(2).first()
+            val weathersDB = weatherDao.getWeathers(2).getOrAwaitValue()
             Assert.assertEquals(weathersDB.isNotEmpty(), true)
             Assert.assertEquals(weathersDB.size, 1)
 
@@ -213,14 +213,14 @@ class WeatherEntityReadWriteTest {
             val weathersDel = weathers.toMutableList()
             weathersDel.removeAt(1)
 
-            var weathersAfterDelete = weatherDao.getWeathers(2).first()
+            var weathersAfterDelete = weatherDao.getWeathers(2).getOrAwaitValue()
             Assert.assertEquals(weathersAfterDelete.isEmpty(), true)
             Assert.assertEquals(weathersAfterDelete.size, 0)
 
             weatherDao.delete(weathers.first())
             weathersDel.removeAt(0)
 
-            weathersAfterDelete = weatherDao.getWeathers(1).first()
+            weathersAfterDelete = weatherDao.getWeathers(1).getOrAwaitValue()
             Assert.assertEquals(weathersAfterDelete.isNotEmpty(), true)
             Assert.assertEquals(weathersAfterDelete.size, 4)
 
