@@ -52,3 +52,10 @@ getWeathers(location: Location)
 ```
 
 
+## TODO
+- make the application design great
+- add more feature to the application
+- add sonar + jacoco plugin
+- add detekt plugin
+- add dokka plugin
+
