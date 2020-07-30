@@ -1,30 +1,45 @@
 package com.hatem.noureddine.core.domain.utils
 
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.map
+import com.hatem.noureddine.core.domain.models.Resource
 
-fun <T> LiveData<List<T>>.empty(): LiveData<List<T>> {
+fun <T> LiveData<List<T>>.notNull(): LiveData<List<T>> {
     return MediatorLiveData<List<T>>().apply {
-        postValue(emptyList())
-        addSource(this@empty) {
+        addSource(this@notNull) {
             when (it.isNullOrEmpty()) {
                 true -> postValue(emptyList())
                 else -> postValue(it)
             }
         }
+        postValue(emptyList())
     }
 }
 
-fun <T> LiveData<T>.nonNull(): NonNullMediatorLiveData<T> {
-    val mediator: NonNullMediatorLiveData<T> = NonNullMediatorLiveData()
-    mediator.addSource(this) { it?.let { mediator.postValue(it) } }
-    return mediator
-}
+/**
+ * Helper to use Sealed Class with liveData and have realtime working observer
+ * @receiver LiveData<List<D>>
+ * @param loadingLiveData MutableLiveData<Loading<List<O>>>
+ * @param transform [@kotlin.ExtensionFunctionType] Function1<D, O>
+ * @return LiveData<Resource<List<O>>>
+ */
+fun <D, O> LiveData<List<D>>.transform(
+    loadingLiveData: MutableLiveData<Resource.Loading<List<O>>>,
+    transform: D.() -> O
+): LiveData<Resource<List<O>>> {
+    val mappedSource = map { list ->
+        Resource.Success(list.map { transform(it) })
+    }
 
-fun <T> NonNullMediatorLiveData<T>.observe(owner: LifecycleOwner, observer: (t: T) -> Unit) {
-    this.observe(owner, Observer { it?.let(observer) })
-}
+    return MediatorLiveData<Resource<List<O>>>().apply {
+        addSource(mappedSource) {
+            postValue(it)
+        }
 
-class NonNullMediatorLiveData<T> : MediatorLiveData<T>()
+        addSource(loadingLiveData) {
+            postValue(it)
+        }
+    }
+}

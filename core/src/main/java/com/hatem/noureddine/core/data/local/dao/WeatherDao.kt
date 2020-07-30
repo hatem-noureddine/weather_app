@@ -1,5 +1,6 @@
 package com.hatem.noureddine.core.data.local.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -7,7 +8,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.hatem.noureddine.core.data.local.WEATHER_DB_TABLE_NAME
 import com.hatem.noureddine.core.data.local.models.DBWeather
-import kotlinx.coroutines.flow.Flow
 
 /**
  * Weather DAO
@@ -28,7 +28,7 @@ internal interface WeatherDao {
      * @return LiveData<List<DBWeather>>
      */
     @Query("SELECT * from $WEATHER_DB_TABLE_NAME WHERE location_uid = :locationUid ORDER BY timestamp ASC")
-    fun getWeathers(locationUid: Int): Flow<List<DBWeather>>
+    fun getWeathers(locationUid: Int): LiveData<List<DBWeather>>
 
     /**
      * delete all weathers from database

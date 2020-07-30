@@ -1,6 +1,7 @@
 package com.hatem.noureddine.core.domain.models
 
 import android.os.Parcelable
+import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -23,6 +24,9 @@ data class Weather(
     val description: String,
     val icon: String
 ) : Parcelable {
+
+    @IgnoredOnParcel
+    val iconUrl: String = "https://openweathermap.org/img/wn/$icon@4x.png"
 
     @Parcelize
     data class Temperature(
