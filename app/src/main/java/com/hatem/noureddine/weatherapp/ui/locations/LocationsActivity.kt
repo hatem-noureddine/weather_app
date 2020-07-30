@@ -6,6 +6,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -16,12 +17,17 @@ import com.hatem.noureddine.core.domain.models.Location
 import com.hatem.noureddine.core.domain.models.Resource
 import com.hatem.noureddine.weatherapp.BuildConfig
 import com.hatem.noureddine.weatherapp.R
-import dagger.hilt.android.AndroidEntryPoint
+import com.hatem.noureddine.weatherapp.ui.weathers.WeatherActivity
+import com.hatem.noureddine.weatherapp.utils.SpaceItemDecoration
+import com.hatem.noureddine.weatherapp.utils.dp
 import kotlinx.android.synthetic.main.activity_locations_list.*
 
-
-@AndroidEntryPoint
-class LocationsActivity : AppCompatActivity() {
+/**
+ * Activity to show locations
+ * @property viewModel LocationsViewModel
+ * @property startForResult ActivityResultLauncher<(android.content.Intent..android.content.Intent?)>
+ */
+class LocationsActivity : AppCompatActivity(), Observer<Resource<List<Location>>> {
 
     private val viewModel: LocationsViewModel by viewModels()
 
@@ -31,13 +37,14 @@ class LocationsActivity : AppCompatActivity() {
                 Activity.RESULT_OK -> {
                     result.data?.let { data ->
                         val place = Autocomplete.getPlaceFromIntent(data)
-                        viewModel.insertLocation(place)
+                        viewModel.insertLocation(place).observe(this, Observer {})
                     }
                 }
 
                 AutocompleteActivity.RESULT_ERROR -> {
                     result.data?.let { data ->
                         val status = Autocomplete.getStatusFromIntent(data)
+                        // TODO try to resolve error
                     }
                 }
             }
@@ -46,6 +53,7 @@ class LocationsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_locations_list)
+        viewModel.getLocations().observe(this, this)
         initFaButton()
 
         //Initialize Places
@@ -53,21 +61,30 @@ class LocationsActivity : AppCompatActivity() {
             Places.initialize(applicationContext, BuildConfig.PLACES_API_KEY)
         }
 
-        refreshCountries()
+        initRecyclerView()
     }
 
-    private fun refreshCountries() {
-        viewModel.getLocations().observe(this, Observer<Resource<List<Location>>> {
-            if (it is Resource.Error) {
-                it.throwable.printStackTrace()
-                recyclerView.adapter = LocationsRecyclerViewAdapter(emptyList())
-                //Snackbar.make()
-            }
+    private fun initRecyclerView() {
+        val space10 = 10.dp
+        val footerSpace = 30.dp
+        recyclerView.addItemDecoration(
+            SpaceItemDecoration(
+                space10,
+                space10,
+                space10,
+                space10,
+                footerSpace
+            )
+        )
 
-            if (it is Resource.Success) {
-                recyclerView.adapter = LocationsRecyclerViewAdapter(it.data)
-            }
-        })
+        val onClickAction = MutableLiveData<Location>().apply {
+            observe(this@LocationsActivity, Observer {
+                // open details weather
+                startActivity(WeatherActivity.newInstance(this@LocationsActivity, it))
+            })
+        }
+
+        recyclerView.adapter = LocationsRecyclerViewAdapter(onClickAction)
     }
 
     private fun initFaButton() {
@@ -91,5 +108,17 @@ class LocationsActivity : AppCompatActivity() {
             Places.deinitialize()
         }
         super.onDestroy()
+    }
+
+    /**
+     * Called when the data is changed.
+     * @param t  The new data
+     */
+    override fun onChanged(resource: Resource<List<Location>>?) {
+        val adapter = (recyclerView.adapter as? LocationsRecyclerViewAdapter)
+        when (resource) {
+            is Resource.Error -> adapter?.values = emptyList()
+            is Resource.Success -> adapter?.values = resource.data
+        }
     }
 }

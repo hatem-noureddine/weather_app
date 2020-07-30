@@ -1,26 +1,27 @@
 package com.hatem.noureddine.weatherapp.ui.locations
 
-import androidx.hilt.lifecycle.ViewModelInject
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.android.libraries.places.api.model.Place
-import com.hatem.noureddine.core.domain.WeatherSDK
 import com.hatem.noureddine.core.domain.exceptions.GenericException
 import com.hatem.noureddine.core.domain.models.Location
 import com.hatem.noureddine.core.domain.models.Resource
+import com.hatem.noureddine.weatherapp.SampleApplication
 
-class LocationsViewModel @ViewModelInject constructor(private val weatherSDK: WeatherSDK) :
-    ViewModel() {
+class LocationsViewModel(application: Application) :
+    AndroidViewModel(application) {
+
+    private val weatherSDK
+        get() = this.getApplication<SampleApplication>().weatherSDK
 
     fun getLocations(): LiveData<out Resource<List<Location>>> =
-        weatherSDK.LocationRepository.getLocations(viewModelScope.coroutineContext)
+        weatherSDK.LocationRepository.getLocations()
 
     fun insertLocation(place: Place): LiveData<out Resource<Location>> {
         return if (place.name?.isNotBlank() == true && place.latLng != null) {
             weatherSDK.LocationRepository.insertLocation(
-                viewModelScope.coroutineContext,
                 Location(
                     name = place.name!!,
                     longitude = place.latLng!!.longitude,

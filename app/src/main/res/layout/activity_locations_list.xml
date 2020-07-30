@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         app:layoutManager="LinearLayoutManager"
         tools:context=".ui.locations.LocationsFragment"
-        tools:listitem="@layout/fragment_locations_item" />
+        tools:listitem="@layout/activity_locations_item" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

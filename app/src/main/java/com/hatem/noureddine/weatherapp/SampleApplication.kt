@@ -1,7 +1,12 @@
 package com.hatem.noureddine.weatherapp
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.hatem.noureddine.core.domain.WeatherSDK
 
-@HiltAndroidApp
-class SampleApplication : Application()
+
+class SampleApplication : Application() {
+
+    val weatherSDK by lazy {
+        WeatherSDK(this)
+    }
+}
